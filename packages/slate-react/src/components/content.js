@@ -82,7 +82,6 @@ class Content extends React.Component {
 
   tmp = {
     isUpdatingSelection: false,
-    isComposing: false,
   }
 
   /**
@@ -343,14 +342,6 @@ class Content extends React.Component {
   onEvent(handler, event) {
     debug('onEvent', handler)
 
-    if (handler === 'onCompositionStart') {
-      this.tmp.isComposing = true
-    }
-
-    if (handler === 'onCompositionEnd') {
-      window.requestAnimationFrame(() => (this.tmp.isComposing = false))
-    }
-
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
     if (
@@ -370,8 +361,9 @@ class Content extends React.Component {
     // at the end of a block. The selection ends up to the left of the inserted
     // character instead of to the right. This behavior continues even if
     // you enter more than one character. (2019/01/03)
-    if (!IS_ANDROID && handler === 'onSelect' && !this.tmp.isComposing) {
-      const { editor } = this.props
+    const { editor } = this.props
+
+    if (!IS_ANDROID && handler === 'onSelect' && !editor.isComposing()) {
       const { value } = editor
       const { selection } = value
       const window = getWindow(event.target)
